@@ -1,8 +1,8 @@
 // Клас, для зберігання данних
 public class Data {
-    // Реєстрація змінних для данних в полі класу
-    private String anyStringData;
-    private Integer anyIntData;
+    // Реєстрація змінних в полі класу, для зберігання данних
+    private String anyStringData; // типу рядок
+    private Integer anyIntData; // типу ціле число
 
     // Метод, отримати дянні з змінної під назвою anyStringData
     public String getAnyStringData() {
