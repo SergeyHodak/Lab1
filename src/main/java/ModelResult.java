@@ -244,5 +244,59 @@ public class ModelResult {
     }
 
     // Виведення всіх оцінок студентів певної групи
+    public List<Exam> findRatingsByGroup(Group group) {
+        List<Exam> result = new ArrayList<>();
+        // Якщо група не зареєстрована в глобальному списку
+        if (findGroup(group) == null) {
+            System.out.println("Group \"" + group.getName() + "\" is not registered in the global list!");
+            return result;
+        }
 
+        // Біг по списку оцінок з іспитів
+        for (Exam exam : exams) {
+            // Біг по списку груп цього предмета, за яким був іспит у студента
+            for (Group unit : exam.getSubject().getGroups()) {
+                // Якщо тут є группа з якої ведеться складання списку оцінок
+                if (unit.getName().equals(group.getName())) {
+                    // Якщо є такий студент
+                    if(findStudentByGroup(exam.getStudent(), group)) {
+                        result.add(exam);
+                    }
+                    break; // Завершити біг по списку груп цього предмета
+                }
+            }
+        }
+        return result;
+    }
+
+    // Приватний метод, чи є студент в вказаній групі
+    private boolean findStudentByGroup(Student student, Group group) {
+        for (Group groupInList : groups) {
+            if (groupInList.getName().equals(group.getName())) {
+                return groupInList.getStudents().contains(student);
+            }
+        }
+        return false;
+    }
+
+    // Видалення групи та всіх студентів у ній
+    public List<Student> getStudentsByGroup(Group group) {
+        for (Group unit : groups) {
+            if (unit.getName().equals(group.getName())) {
+                return unit.getStudents();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // Зміна оцінки з предмета та ПІБ конкретного студента. (Зрозумів це як: Зміна оцінки з предмета по ПІБ конкретного студента)
+    public void setRatingWithSubjectByStudent(Subject subject, Student student, int rating) {
+        for (Exam exam : exams) {
+            if (exam.getSubject().getName().equals(subject.getName()) &
+                exam.getStudent().equals(student)
+            ) {
+                exam.setRating(rating);
+            }
+        }
+    }
 }

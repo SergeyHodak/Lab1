@@ -33,4 +33,17 @@ public class Student {
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
     }
+
+    // Для порівнювань
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+
+        Student student = (Student) o;
+
+        if (!getLastName().equals(student.getLastName())) return false;
+        if (!getFirstName().equals(student.getFirstName())) return false;
+        return getMiddleName().equals(student.getMiddleName());
+    }
 }
