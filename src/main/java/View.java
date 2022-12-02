@@ -5,7 +5,7 @@ public class View {
     private final static Scanner scanner = new Scanner (System.in);
 
     // Метод виведення меню
-    public void printMenuData(){
+    public void printMenuData() {
         System.out.println("Please select command:");
         System.out.println("1 - add new data");
         System.out.println("2 - find data");
@@ -15,24 +15,24 @@ public class View {
     }
 
     // Метод читання команди користувача
-    public Integer readCommand(){
+    public Integer readCommand() {
         return scanner.nextInt();
     }
 
     // Метод виведення будь-якого вхідного рядка
-    public void printIncomingString(String incomingString){
+    public void printIncomingString(String incomingString) {
         System.out.println(incomingString);
     }
 
     // Метод читання вхідного рядка для даних
-    public String readStringData(){
+    public String readStringData() {
         System.out.println("Enter string data...");
         String incomingString = scanner.next(); // Ввести дані типу "Рядок"
         return incomingString;
     }
 
     // Метод читання вхідного числа для даних
-    public Integer readIntData()	{
+    public Integer readIntData() {
         System.out.println("Enter number data...");
         Integer incomingNumber = scanner.nextInt(); // Ввести дані типу "Ціле число"
         return incomingNumber;

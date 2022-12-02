@@ -280,13 +280,15 @@ public class ModelResult {
     }
 
     // Видалення групи та всіх студентів у ній
-    public List<Student> getStudentsByGroup(Group group) {
-        for (Group unit : groups) {
-            if (unit.getName().equals(group.getName())) {
-                return unit.getStudents();
+    public void removeGroup(Group group) {
+        int index = -1;
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.get(i).getName().equals(group.getName())) {
+                index = i;
+                break;
             }
         }
-        return new ArrayList<>();
+        groups.remove(index);
     }
 
     // Зміна оцінки з предмета та ПІБ конкретного студента. (Зрозумів це як: Зміна оцінки з предмета по ПІБ конкретного студента)
