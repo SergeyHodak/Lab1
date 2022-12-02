@@ -5,11 +5,18 @@ public class ModelResult {
     private List<Subject> subjects = new ArrayList<>(); // Глобальне поле, список предметів
     private List<Group> groups = new ArrayList<>(); // Глобальне поле, список груп
     private List<Student> students = new ArrayList<>(); // Глобальне поле, список студентів
+    private List<Exam> exams = new ArrayList<>(); // Глобальне поле, список іспитів
 
     // Додавання нового предмета до глобального списку
     public void createSubject(String name) {
         Subject subject = new Subject(); // Новий екземпляр класу "предмат"
         subject.setName(name); // Присвоєння екземпляру "назви придмета"
+
+        // Якщо предмет вже зареєстрований в глобальному списку
+        if (findSubject(subject) != null) {
+            System.out.println("\"" + name + "\" is already registered!");
+            return;
+        }
         subjects.add(subject); // Додати екземпляр до глобального списку предметів
     }
 
@@ -17,6 +24,12 @@ public class ModelResult {
     public void createGroup(String name) {
         Group group = new Group(); // Новий екземпляр класу "група"
         group.setName(name); // Присвоєння екземпляру "назви групи"
+
+        // Якщо група вже зареєстрована в глобальному списку
+        if (findGroup(group) != null) {
+            System.out.println("\"" + name + "\" is already registered!");
+            return;
+        }
         groups.add(group); // Додати екземпляр до глобального списку груп
     }
 
@@ -26,6 +39,12 @@ public class ModelResult {
         student.setLastName(lastName); // Присвоїти екземпляру "прізвище"
         student.setFirstName(firstName); // Присвоїти екземпляру "ім'я"
         student.setMiddleName(middleName); // Присвоїти екземпляру "по батькові"
+
+        // Чи може вже цей студент зареєстрований?
+        if (findStudent(student) !=  null) {
+            System.out.println("Student \"" + lastName + " " + firstName + " " + middleName +  "\" is already registered!");
+            return;
+        }
         students.add(student); // Додати екземпляр до глобального списку студентів
     }
 
@@ -46,16 +65,10 @@ public class ModelResult {
             return; // Вийти з методу
         }
 
-        // Біг по глобальному списку студентів
-        for (Student unit : students) {
-            // Якщо такий студент є в глобальному списку
-            if (unit.getLastName().equals(student.getLastName()) &
-                    unit.getFirstName().equals(student.getFirstName()) &
-                    unit.getMiddleName().equals(student.getMiddleName())
-            ) {
-                groups.get(idGroup).addStudent(unit); // Додати студента до групи
-                return; // Вийти з методу
-            }
+        // Якщо такий студент є в глобальному списку
+        if (findStudent(student) != null) {
+            groups.get(idGroup).addStudent(student); // Додати студента до групи
+            return; // Вийти з методу
         }
         // Студент не зареєстрований в глобальному списку студентів
         System.out.println("Student \"" + student.getLastName() + " " + student.getFirstName() + " " +
@@ -94,20 +107,8 @@ public class ModelResult {
     // Пошук та виведення предметів по ПІБ студента
     public List<String> findSubjectsByStudent(Student student) {
         List<String> result = new ArrayList<>(); // Список на віддічу з метода
-        boolean existenceInList = false; // Наявність студента в глобальному списку
-        // Біг по глобальному списку студентів
-        for (Student unit : students) {
-            // Якщо такий студент є
-            if (unit.getLastName().equals(student.getLastName()) &
-                unit.getFirstName().equals(student.getFirstName()) &
-                unit.getMiddleName().equals(student.getMiddleName())
-            ) {
-                existenceInList = true; // Реєструймо що є співпадання
-                break; // Завершити цикл
-            }
-        }
         // Якщо студента нема в глобальному списку
-        if (!existenceInList) {
+        if (findStudent(student) == null) {
             return result; // Віддати пустий масив та завершити виконання методу
         }
 
@@ -134,4 +135,114 @@ public class ModelResult {
         }
         return result; // Віддати результат
     }
+
+    // Пошук та виведення групи з ПІБ студента (Зрозумів це як: Пошук груп за ПІБ студента)
+    public List<Group> findGroupsByStudent(Student student) {
+        List<Group> result = new ArrayList<>(); // Список на віддічу з метода
+        // Якщо студента нема в глобальному списку
+        if (findStudent(student) == null) {
+            return result; // Віддати пустий масив та завершити виконання методу
+        }
+
+        // Біг по глобальному списку груп
+        for (Group group : groups) {
+            // Біг по студентам групи
+            for (Student groupStudent : group.getStudents()) {
+                // Якщо в цій групі є вказаний студент
+                if (groupStudent.getLastName().equals(student.getLastName()) &
+                    groupStudent.getFirstName().equals(student.getFirstName()) &
+                    groupStudent.getMiddleName().equals(student.getMiddleName())
+                ) {
+                    result.add(group); // Додати до результуючого списку цю групу
+                    break; // Вийти з циклу бігання по списку студентів цієї групи
+                }
+            }
+        }
+        return result;
+    }
+
+    // Приватний метод, перевірка чи є студент в глобальному списку
+    private Student findStudent(Student student) {
+        // Біг по глобальному списку студентів
+        for (Student unit : students) {
+            // Якщо такий студент є
+            if (unit.getLastName().equals(student.getLastName()) &
+                    unit.getFirstName().equals(student.getFirstName()) &
+                    unit.getMiddleName().equals(student.getMiddleName())
+            ) {
+                return unit;
+            }
+        }
+        return null;
+    }
+
+    // Пошук груп за назвою предмета
+    public List<Group> findGroupsBySubject(Subject subject) {
+        for (Subject unit : subjects) {
+            if (unit.getName().equals(subject.getName())) {
+                return unit.getGroups();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // Додавання оцінки конкретному студенту з конкретного іспиту
+    public void createRating(Student student, Subject subject, int rating) {
+        // Отримати студента з глобального списку
+        Student isStudent = findStudent(student);
+        // Якщо такого студента нема в глобальному списку
+        if (isStudent == null) {
+            System.out.println("Student \"" + student.getLastName() + " " + student.getFirstName() + " " +
+                    student.getMiddleName() + "\" is not found in the global registry");
+            return;
+        }
+
+        // Отримати предмет з глобального списку
+        Subject isSubject = findSubject(subject);
+        // Якщо такого предмета нема в глобальному списку
+        if (isSubject == null) {
+            System.out.println("Subject \"" + subject.getName() + "\" is not found in the global registry");
+            return;
+        }
+
+        // Створюємо екземпляр іспиту та заповнюємо його
+        Exam exam = new Exam();
+        exam.setSubject(isSubject);
+        exam.setStudent(isStudent);
+        exam.setRating(rating);
+
+        // Перевіряємо чи може вже є такий запис
+        for (Exam unit : exams) {
+            if (unit.getSubject() == exam.getSubject() & unit.getStudent() == exam.getStudent()) {
+                System.out.println("Such a key already exists. It has the value : " + unit.getRating());
+                return;
+            }
+        }
+
+        // Реєструймо цей екземпляр в глобальному списку
+        exams.add(exam);
+    }
+
+    // Приватний метод, перевірка чи є предмет в глобальному списку
+    private Subject findSubject(Subject subject) {
+        for (Subject unit : subjects) {
+            if (unit.getName().equals(subject.getName())) {
+                return unit;
+            }
+        }
+        return null;
+    }
+
+    // Приватний метод, перевірка чи є група в глобальному списку
+    private Group findGroup(Group group) {
+        for (Group unit : groups) {
+            if (unit.getName().equals(group.getName())) {
+                return unit;
+            }
+        }
+        return null;
+    }
+
+    // Виведення всіх оцінок студентів певної групи
+
 }
