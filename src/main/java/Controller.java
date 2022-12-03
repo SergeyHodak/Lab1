@@ -1,52 +1,97 @@
+import java.util.List;
+import java.util.Scanner;
+
 // Клас контролера - зв'язок моделі та інтерфейсу системи
 public class Controller {
-    // Єдиний метод в класі
-    public void initController(){
-
-        View view = new View(); // Створення виду
-        Model model = new Model();// Створення моделі
-
-        while(true) { // Безкінечний цикл вайл
-            view.printMenuData(); // ....виводити меню.
-            Integer command = view.readCommand();// ...зчитувати команду...
-
-            if(command.equals(5)) { // поки користувач не введе (вихід, команда 5) (або не відключать світло :) )
-                break; // Вихід з безкінечного циклу
-            } else if(command.equals(1)){ // якщо користувач ввів команду додавання
-                view.printIncomingString("Enter data to add:"); //виводимо переважний рядок
-                model.create(view.readIntData(), view.readStringData()); //зчитуємо та створюємо новий запис
-                view.printIncomingString("Data was added");
-            } else if(command.equals(2)){ // якщо користувач ввів команду пошуку
-                view.printIncomingString("Enter data to find:");
-                Data data = model.find(view.readStringData()); //Шукаємо дані
-                if(data != null) { //якщо знайшли
-                    view.printData(data); //виводимо їх
-                } else {
-                    view.printIncomingString("Nothing to show...");//інакше говоримо, що нічого не знайшли
+    public void init() {
+        Scanner scanner = new Scanner(System.in); // Сканер
+        View view = new View(scanner); // Візуалка
+        Model model = new Model(); // Модель
+        boolean perform = true;
+        while(perform) {
+            view.printMenu(); // Вивести меню
+            int command = view.readCommand(); // Отримати команду
+            switch (command) {
+                case 13 -> { // Вихід
+                    perform = false; // Реєстрація зупинення циклу
                 }
-            } else if(command.equals(3)) { //якщо користувач ввів команду оновлення
-                view.printIncomingString("Enter data to update:");
-                view.printIncomingString("Enter old string: ");
-                Data newData = model.update(view.readStringData(), //зчитуємо дані для пошуку та шукаємо
-                        view.readStringData(),
-                        view.readIntData());
-                view.printIncomingString("result of updating:");
-                if(newData != null) { //якщо знайшли
-                    view.printData(newData); //виводимо що знайшли
-                } else {
-                    view.printIncomingString("Nothing to update");
+                case 1 -> { // Додати новий предмет
+                    String subjectName = view.readStringData("subjectName"); // Отримати від користівача рядок
+                    String result = model.createSubject(subjectName); // Виконати реєстрацію предмета
+                    view.printIncomingString(result); // Оголосити результат виконання команди
                 }
-            } else if (command.equals(4)) { //якщо користувач ввів команду видалення
-                view.printIncomingString("Enter data to delete:");
-                int index = model.delete(view.readStringData()); //зчитуємо та видаляємо дані
-                if(index != -1) {
-                    view.printIncomingString("Data in index" + index + " was deleted..."); //якщо видалили - виводимо віддалений індекс
-                } else {
-                    view.printIncomingString("Nothing to delete");
+                case 2 -> { // Додати нову групу
+                    String groupName = view.readStringData("groupName");// Отримати від користівача рядок
+                    String result = model.createGroup(groupName);// Виконати реєстрацію групи
+                    view.printIncomingString(result); // Оголосити результат виконання команди
                 }
-            } else { // повідомляємо що немає такої команди
-                view.printIncomingString("Wrong command");
+                case 3 -> { // Додати нового студента
+                    Student student = getStudent(view); // Студент
+                    String result = model.createStudent(student); // Реєстрація
+                    view.printIncomingString(result); // Результат
+                }
+                case 4 -> { // Додати студента в групу
+                    Student student = getStudent(view); // Студент
+                    String groupName = view.readStringData("groupName"); // Група
+                    String result = model.addStudentInGroup(groupName, student); // Реєстрація
+                    view.printIncomingString(result); // Результат
+                }
+                case 5 -> { // Додати групу в предмет
+                    String subjectName = view.readStringData("subjectName"); // Предмет
+                    String groupName = view.readStringData("groupName"); // Група
+                    String result = model.addGroupInSubject(subjectName, groupName); // Реєстрація
+                    view.printIncomingString(result); // Результат
+                }
+                case 6 -> { // Знайти предмети по студенту
+                    Student student = getStudent(view); // Студент
+                    List<String> result = model.findSubjectsByStudent(student); // Пошук
+                    view.printSubjectNames(result); // Друкувати результат
+                }
+                case 7 -> { // Знайти групи по студенту
+                    Student student = getStudent(view); // Студент
+                    List<Group> result = model.findGroupsByStudent(student); // Пошук
+                    view.printGroupNames(result); // Друкувати результат
+                }
+                case 8 -> { // Знайти групи по предмету
+                    String subjectName = view.readStringData("subjectName"); // Предмет
+                    List<Group> result = model.findGroupsBySubject(subjectName); // Пошук
+                    view.printGroupNames(result); // Друкувати результат
+                }
+                case 9 -> { // Добати оцінку по ключу (студент та предмет)
+                    Student student = getStudent(view); // Студент
+                    String subjectName = view.readStringData("subjectName"); // Предмет
+                    int rating = view.readIntData("rating"); // Оцінка
+                    String result = model.createRating(student, subjectName, rating); // Реєстрація
+                    view.printIncomingString(result); // Результат
+                }
+                case 10 -> { // Отримати всі оцінки за групою
+                    String groupName = view.readStringData("groupName"); // Група
+                    List<Exam> result = model.findRatingsByGroup(groupName); // Пошук
+                    view.printAllRatings(result); // Друкувати результат
+                }
+                case 11 -> { // Видалити групу
+                    String groupName = view.readStringData("groupName"); // Група
+                    String result = model.removeGroup(groupName);// Видалення
+                    view.printIncomingString(result); // Результат
+                }
+                case 12 -> { // Зіміна оцінки
+                    String subjectName = view.readStringData("subjectName"); // Предмет
+                    Student student = getStudent(view); // Студент
+                    int rating = view.readIntData("rating"); // Оцінка
+                    String result = model.setRatingWithSubjectByStudent(subjectName, student, rating);// Оновлення
+                    view.printIncomingString(result); // Результат
+                }
+                default -> view.printIncomingString("This team is not registered");
             }
         }
+        scanner.close();
+    }
+
+    private Student getStudent(View view) {
+        Student student = new Student(); // Екземпляр
+        student.setLastName(view.readStringData("lastName")); // Прізвище
+        student.setFirstName(view.readStringData("firstName")); // Ім'я
+        student.setMiddleName(view.readStringData("middleName")); // По батькові
+        return student;
     }
 }
